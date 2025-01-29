@@ -1,0 +1,625 @@
+\documentclass{mcmthesis}
+\mcmsetup{CTeX = false,    % 使用 CTeX 套装时，设置为 true
+          tcn = {2520840}, problem = \textcolor{red}{A},
+          sheet = true, titleinsheet = true, keywordsinsheet = true,
+          titlepage = false, abstract = false}
+        
+\usepackage{newtxtext}     % \usepackage{palatino}
+\usepackage[backend=bibtex]{biblatex}   % for RStudio Complie
+
+\usepackage{tocloft}
+\setlength{\cftbeforesecskip}{6pt}
+\renewcommand{\contentsname}{\hspace*{\fill}\Large\bfseries Contents \hspace*{\fill}}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{lastpage}
+%\usepackage{indentfirst}
+
+\title{The Wear of Staircases: An Archaeological Perspective}
+
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+\hspace{1.5em}This paper presents a comprehensive study on the wear patterns of staircases from an archaeological perspective. We develop a series of models to analyze and predict the wear behavior of stairs under various conditions. Our approach begins with the establishment of the \textbf{Archard Wear Model}, which is used to compute the total wear volume when walking on stairs. We enhance this model by incorporating additional factors such as temperature variations, load distribution, and surface roughness, which significantly influence the wear volume. This modification makes the model more applicable to real-world scenarios.
+
+To further refine our predictions, we introduce the Finite Element Method (FEM) to optimize the pressure distribution parameter. This method allows us to discretize the stair area into a mesh of elements, enabling a more accurate numerical approximation of the pressure field. By integrating the optimized pressure distribution, we refine the Archard Wear Model, thereby enhancing its predictive accuracy.
+
+We also consider the impact of natural factors by proposing the 、、\textbf{Material Aging Model}, which accounts for the temporal variations in material hardness.This model dynamically tracks property evolution to better capture environmental degradation processes. We estimate the aging process using Newton’s method iteration, providing an approximate prediction of the material’s lifespan under varying conditions.
+
+To estimate the age of the stairs, we integrate the Archard Wear Model with a \textbf{Material Aging Model}.This integration allows us to account for the cumulative effects of human-induced aging and natural aging, providing a more accurate representation of the material's lifespan.
+
+To assess the reliability of our models, we conduct a sensitivity analysis by computing the partial derivatives of the estimated age with respect to each parameter. Additionally, we utilize Monte Carlo simulations to account for parametric uncertainties and estimate the confidence interval of the predicted age. From a qualitative perspective, we validate the model by comparing its predictions with known ages of staircases. The relative error is calculated to ensure the model’s accuracy and reliability in real-world applications.
+
+In summary, this paper proposes a multifaceted approach to analyze stair wear, including the Archard Wear Model, the Finite Element Method for pressure optimization, the Material Aging Model, and a comprehensive evaluation framework. Our models not only provide a robust tool for predicting material degradation but also offer valuable insights into the historical usage patterns of staircases.
+
+\hspace{1.5em} \begin{keywords}
+Archard wear model, Material Aging Model, wear volume, Finite Element Method
+\end{keywords}
+
+\end{abstract}
+
+\maketitle
+
+%% Generate the Table of Contents, if it's needed.
+% \renewcommand{\contentsname}{\centering Contents}
+\tableofcontents        % 若不想要目录, 注释掉该句
+\thispagestyle{empty}
+
+\newpage
+
+\section{Introduction}
+
+\subsection{Background}
+
+\hspace{1.5em}Stairs, as an essential architectural component for connecting vertical spaces, hold a universal and irreplaceable role in modern built environments. From a structural engineering perspective, contemporary stairs are primarily constructed using modern building materials such as reinforced concrete and steel. These materials not only exhibit excellent load-bearing and fire-resistant properties but also demonstrate significant advantages in terms of structural rigidity, cost-effectiveness, construction convenience, and design versatility.
+
+However, from the standpoint of material mechanics, any building material is inevitably subject to wear and tear over prolonged use. Such wear holds substantial academic value for archaeological research. According to the principles of tribology, the wear on material surfaces primarily results from the relative motion between the surface and hard particles or metals, leading to the loss of surface material. Specifically, the wear characteristics of stairs show a significant correlation with parameters such as the building's age and foot traffic. These wear patterns not only provide empirical data for studies on material durability but also serve as important historical information carriers for archaeological research, highlighting their value in interdisciplinary studies.
+
+
+
+\subsection{Restatement of the Problem}
+
+\begin{itemize}
+\item First,the problem requires developing a model to analyze the wear patterns on stairs to infer information such as the frequency of use, predominant direction of travel, and the number of simultaneous users.
+
+\item Then, the model should address more complex questions, including the consistency of wear with historical records, the reliability of age estimates, and the identification of material sources. 
+
+\item Finally,The solution must be based on non-destructive, cost-effective measurements that can be conducted by a small team with minimal tools.
+
+
+\end{itemize}
+
+\subsection{Our Work}
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=14cm]{P1.png}
+    \caption{The Process of Modeling}
+\end{figure}
+\hspace{1.5em}The wear model was developed based on the Archard Equation. In this study, the model was extended to incorporate several critical factors that significantly influence the total wear volume, such as temperature variations, load distribution, and surface roughness. These factors were carefully analyzed and integrated into the model to ensure its accuracy and reliability under diverse operating conditions. To further enhance the model's applicability to real-world scenarios, key parameters, including the wear coefficient and hardness factor, were adjusted and refined through experimental validation and real-world data analysis.
+
+Furthermore, drawing inspiration from the material aging model, the total aging process was defined as the accumulated effect of human-induced aging and natural aging. By separating aging into these two components, a comprehensive time-dependent model was established to capture the dynamic evolution of material properties.
+
+To quantify the aging process, the range of material aging over time was estimated using Newton's method iteration. This approach provided an approximate prediction of the material's aging range and offered a practical estimation of its lifespan under varying conditions.The iterative process was designed to balance computational efficiency and reasonable accuracy, making the model a useful tool for predicting material degradation in real-world applications.
+
+
+
+\section{Assumptions and Notiation}
+\subsection{Assumptions and Justification}
+
+\hspace{1.5em}To simplify the problem and make it convenient for us to simulate real-life conditions, we make the following basic assumptions, each of which is properly justified.
+
+\begin{itemize}
+\item {\bf Assumption:The wear volume is calculated by treating it as a rectangular prism}. 
+\item {\bf Justification:}The contact between a person and a step occurs on a planar surface, and the duration of this contact is significantly shorter compared to the timescale of stone wear. Consequently, the wear inflicted on the step by a single individual's movement is negligible.Therefore, it can be assumed that the wear depth caused by a single person approximates an infinitesimal vertical distance, while the forward movement of the foot represents a horizontal distance. This configuration can be approximated as a rectangular prism in shape.
+
+\item {\bf Assumption:Daily foot traffic is assumed to be relatively evenly distributed}. 
+\item {\bf Justification:}Precise daily records of foot traffic for ancient staircases are typically unavailable.Therefore, a uniform distribution of pedestrian flow is assumed, and the validity of this assumption is assessed through sensitivity analysis.The resulting error is determined to be within acceptable archaeological standards.
+
+\item {\bf Assumption:We ignore the wear and tear resulting from environmental factors}. 
+\item {\bf Justification:}According to Reference \cite{3}, the degree of weathering contributes significantly less to the wear of steps compared to the wear depth caused by human foot traffic. Weathering typically results in uniform surface degradation rather than localized depressions. Therefore, the impact of natural weathering on step wear can be neglected in the calculations.
+
+
+%\item {\bf We ignore radiative thermal exchange}. According to Stefan-Boltzmann’s law, the radiative thermal exchange can be ignored when the temperature is low. Refer to industrial standard \cite{6}, the temperature in bathroom is lower than 100 $^{\circ}$C, so it is reasonable for us to make this assumption.
+
+%\item {\bf The temperature of the adding hot water from the faucet is stable}. This hypothesis can be easily achieved in reality and will simplify our process of solving the problem.
+\end{itemize}
+
+\subsection{Notations}
+
+\begin{center}
+\begin{tabular}{clc}
+{\bf Symbols} & {\bf Description} & \quad {\bf Unit} \\[0.25cm]
+$V$ & wear volume & \quad mm^3 
+\\[0.2cm]
+$k$ & wear coefficient & \quad dimensionless \\[0.2cm]
+$F$ & normal load force on the contact surface & \quad N \\[0.2cm]
+% $\rho$ & Density & \quad kg/m$^2$ \\[0.2cm]
+$S$ & relative sliding distance & \quad mm \\[0.2cm]
+$H$ & material hardness & \quad N/m^2 \\[0.2cm]
+% $\tau$ & Time & \quad s, min, h \\[0.2cm]
+$\mu_x$ & The central position of the pressure (x-axis) on the steps & \quad mm \\[0.2cm]
+$\mu_y$ & The central position of the pressure (y-axis) on the steps & \quad mm \\[0.2cm]
+$\sigma_x$ & The spread range of the pressure distribution(x-axis) & \quad mm \\[0.2cm]
+$\sigma_y$ & The spread range of the pressure distribution(y-axis) & \quad mm \\[0.2cm]
+$D$ & wear depth & \quad mm \\[0.2cm]
+$A_0$ & initial material hardness & \quad N/m^2 \\[0.2cm]
+$\lambda$ & aging rate & \quad dimensionless \\[0.2cm]
+$t$ & time & \quad year \\[0.2cm]
+$T$ & Kelvin temperature  & \quad K \\[0.2cm]
+$k_B$ & Boltzmann constant  & \quad dimensionless
+% $a,\,b,\,c$ & The size of a bathtub  & \quad m$^3$
+\end{tabular}
+\end{center}
+
+\noindent \hspace{1.5em}where we define the main parameters while specific value of those parameters will be given later.
+
+
+%In our basic model, we aim at three goals: keeping the temperature as even as possible, making it close to the initial temperature and decreasing the water consumption.
+
+%We start with the simple sub-model where hot water is added constantly.At first we introduce convection heat transfer control equations in rectangular coordinate system. Then we define the mean temperature of bath water.
+
+%Afterwards, we introduce Newton cooling formula to determine heat transfer capacity. After deriving the value of parameters, we get calculating results via formula deduction and simulating results via CFD.
+
+%Secondly, we present the complicated sub-model in which hot water is added discontinuously. We define an iteration consisting of two process:heating and standby. As for heating process, we derive control equations and boundary conditions. As for standby process, considering energy conservation law, we deduce the relationship of total heat dissipating capacity and time.
+
+%Then we determine the time and amount of added hot water. After deriving the value of parameters, we get calculating results via formula deduction and simulating results via CFD.
+
+%At last, we define two criteria to evaluate those two ways of adding hot water. Then we propose optimal strategy for the user in a bathtub.
+%The whole modeling process can be shown as follows.
+
+
+\section{Sub-model I : Archard Wear Model}
+
+\hspace{1.5em}We begin by developing a sub-model to simulate the wear caused by the walking process. Subsequently, we incorporate natural factors that influence the parameter k and derive the corresponding mathematical formulation to describe this process. To enhance the realism of the simulation, Finite Element Method (FEM) is employed to model the actual walking conditions, and the total force exerted over the walking area is calculated using an area integral. Finally, the model is validated against historical real-world data, and its accuracy is thoroughly analyzed.
+
+
+\subsection{Control Equations and Model Modified}
+
+\hspace{1.5em}According to the Archard wear model \cite{1}, the total wear volume is governed by several key factors: the wear coefficient, the material hardness, the applied normal force, and the sliding distance. This relationship forms the foundational equation of the Archard wear model, which is expressed mathematically as follows:
+
+%\begin{figure}[h] 
+%\centering
+
+%\includegraphics[width=8cm]{fig2.jpg}
+
+%\caption{Modeling process} \label{fig2}
+%\end{figure}
+
+%In the basis of this, we introduce the following equations \cite{5}:
+
+\begin{itemize}
+\item {\bf Archard equation}
+\end{itemize}
+
+\begin{equation} %\label{eq1}
+%\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} +\frac{\partial w}{\partial z} =0
+\label{eq:1}
+V = k \cdot \frac{F \cdot S}{H} 
+\end{equation}
+
+\noindent \hspace{1.5em}he Archard wear model describes the total wear volume during the walking process. However, in real-world scenarios, additional factors such as temperature variations and the distribution of walking forces must be considered to accurately capture the wear behavior.To address these complexities, we propose the following modified model:  
+
+\begin{itemize}
+\item {\bf Optimization of k and H}
+\end{itemize}
+\hspace{1.5em}It is widely recognized that in real-world scenarios, the wear coefficient and material hardness are not constant.These properties are influenced by various environmental factors, with temperature being a significant one. Taking this into account, we have incorporated temperature considerations into our analysis. Based on this rationale, we proceed with the following modified approach:
+
+\begin{equation}
+\label{eq:2}
+\hfill k = k_0 \cdot exp{(-\frac{E_k}{k_B\cdot T})} \hfill
+\end{equation}
+
+\begin{equation}
+H = H_0 \cdot exp{(-\frac{E_H}{k_B\cdot T})} \label{eq:3}
+\end{equation}
+
+Here, \(k_0\) represents the initial wear coefficient of the material, and \(H_0\) denotes the initial hardness of the material.
+
+\begin{itemize}
+\item {\bf Using FEM to optimize the parameter F}
+\end{itemize}
+
+\begin{equation} 
+\label{eq:4}
+\hfill p(x,y) = \frac{1}{2\pi\sigma_x\sigma_y} exp[-\frac{1}{2}(\frac{(x-\mu_x)^2}{\sigma_x^2} + \frac{(y-\mu_y)^2}{\sigma_y^2})]
+\end{equation}
+
+\noindent \hspace{1.5em}The function P(x,y) represents the pressure distribution at the point (x,y) on the stair area.To optimize the pressure distribution, we employ the Finite Element Method (FEM) to discretize the stair area into a mesh of elements. This allows us to numerically approximate p(x,y) by solving the governing equations over each element, ensuring a more accurate representation of the pressure field.
+
+Therefore, the total pressure F can be calculated as follows:
+\begin{equation}
+\label{eq5}
+\iint_A p(x, y) \, dx \, dy
+\end{equation}
+    
+where A denotes the footstep area. Through this calculation, we can determine the total pressure exerted by the footstep. By integrating the optimized pressure distribution obtained from the FEM analysis, we derive a more precise total pressure value. Based on the modified equation above, we can further refine the Archard wear model to account for the optimized pressure distribution, thereby enhancing its predictive accuracy.
+
+\subsection{Task 1: Assessment of Stair Utilization Frequency}
+
+\hspace{1.5em}To quantitatively evaluate the usage frequency of the stairs, we propose to measure the number of people passing through the stairs per unit time. This metric serves as a direct indicator of the stairs' utilization intensity. The equations used to model this relationship are as follows:
+\begin{equation}
+\label{eq6}
+\hfill V_{use} = k \cdot \frac{F_0\cdot S_0}{H_0}
+\end{equation}
+
+\begin{equation}
+\label{eq7}
+\hfill N = \frac{V}{V_{use}}
+\end{equation}
+
+where \( V_{\text{use}} \) represents the wear volume per person, which quantifies the material wear caused by an individual's usage of the stairs, and \( N \) denotes the number of people within a specific time period. By analyzing the variation in \( N \), we can infer the usage frequency of the stairs. Specifically, a higher value of \( N \) indicates a more frequent usage of the stairs, while a lower value suggests reduced activity. This relationship allows us to establish a connection between the wear volume and the actual usage patterns of the stairs, providing valuable insights for maintenance and design optimization.
+
+\subsection{Task 2: Investigation of Directional Preference in Stair Usage}
+\hspace{1.5em}When walking on stairs, the distribution of force varies depending on the direction of movement. During ascent (going upstairs), the primary force is concentrated on the \textbf{back} of the stair (closer to the higher step). Conversely, during descent (going downstairs), the primary force is concentrated on the \textbf{front} of the stair (closer to the lower step). This force distribution pattern is illustrated in Figure 2.
+
+\begin{figure}[h] % [h] 表示尽量放在当前位置
+    \centering
+    \includegraphics[width=12cm]{P3.png} 
+    \caption{Illustration of Force Points During Stair Ascent(Left) and Descent(Right)}
+    \label{fig3}
+\end{figure}
+
+%V_rear表示后端（下楼），V_front表示前端（上楼）
+To quantify the wear patterns associated with these force distributions, we calculate the wear volumes for the rear and front regions of the stair, denoted as \( V_{\text{back}} \) and \( V_{\text{front}} \), respectively. Based on these calculations, we define a dimensionless parameter, \( \text{value} \), as the ratio of the two wear volumes:
+
+\begin{equation}
+    \hfill \text{value} = \frac{V_{\text{back}}}{V_{\text{front}}}
+    \label{eq:value}
+\end{equation}
+       
+The parameter \( \text{value} \) serves as an indicator of directional preference in stair usage. Specifically:
+\begin{itemize}
+    \item If \( \text{value} > 1 \), it indicates a preference for ascending the stairs (more wear on the back of the stairs).
+    \item If \( \text{value} < 1 \), it indicates a preference for descending the stairs (more wear on the front of the stair).
+\end{itemize}
+
+This approach provides a quantitative method to analyze the directional preference of stair usage based on wear patterns, offering insights into the behavioral dynamics of stair users.
+
+\subsection{Task 3: Assessment of Group Versus Single-File Stair Usage}
+
+\hspace{1.5em}In real-life scenarios, it is evident that when multiple individuals ascend or descend stairs simultaneously, the distribution of foot placements is broader compared to when individuals use the stairs in a single-file manner. This observation is crucial for understanding the wear patterns on stair surfaces. Inspired by this phenomenon, we propose a method to evaluate stair usage patterns by analyzing the width of the wear footprint.
+
+The mathematical model to describe this situation is given by the following equations:
+
+\begin{equation}
+\label{eq9}
+\hfill L(t) = k \cdot \frac{1}{\sigma\sqrt{2\pi}} \cdot exp[-\frac{(x-\mu)^2}{2\sigma^2}]\cdot g(t)
+\end{equation}
+
+where \( g(t) \) is a function determined by the parameter \( t \), and is defined as:
+\begin{equation}
+\label{eq10}
+\hfill g(t) = e^{-\lambda t}
+\end{equation}
+
+In these equations, \( \sigma \) and \( \mu \) represent the standard deviation and mean of the sample wear depth, respectively. The parameter \( \lambda \) is a decay rate that affects the function.\( g(t) \).
+
+By evaluating the length \( L(t) \), we can infer the usage pattern of the stairs. A broader distribution of foot placements, indicated by alarger,\( \sigma \), suggests group usage, whereas a narrower distribution, indicated by asmaller,\( \sigma \), suggests single-file usage. This method provides a quantitative approach to differentiate between these two modes of stair usage, which is essential for maintenance planning and understanding the dynamics of pedestrian traffic.
+
+\subsection{Task 4: Consistency Between Model-Predicted Wear and Actual Observations}
+\hspace{1.5em}In this part, considering the above modeling process, we decide to use the nonlinear regression and computer simulation method to test the fitting result of our model. The result is shown below:
+
+\begin{figure}[h] % [h] indicates to place the figure approximately here
+    \centering
+    \includegraphics[width=12cm]{P2.png} % Ensure the image file name matches your actual file
+    \caption{Results of Nonlinear Regression Fitting}
+    \label{fig:nonlinear_fit}
+\end{figure}
+
+According to the computer simulation, the result \( R^2 = 0.7923 \) shows that the model is basically fitting the real wear data. It can be concluded that the model's performance is relatively sufficient to make more predictions.
+
+
+\section{Sub-model II: Material Aging Model}
+\hspace{1.5em}To enhance environmental simulation fidelity, our framework explicitly accounts for temporal variations in material hardness through the integration of a Material aging model. This approach dynamically tracks property evolution to better capture environmental degradation processes
+\subsection{Model Description}
+\hspace{1.5em}Drawing upon established material degradation studies\textsuperscript{[3]}, we developed the following hardness evolution model to characterize temporal changes in material properties:
+\begin{equation}
+\label{eq9}
+\hfill H(t) = H_0 \cdot e^{-\lambda t}
+\end{equation}
+
+For different materials, there exist distinct aging curves. Taking the relatively typical stone and wood as examples, the following figure presents their respective aging curves.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{P9.jpg}
+    \caption{Aging Curves of Stone and Wood}
+\end{figure}
+
+\subsection{Task 8: Analysis of Stair Usage Patterns: Daily Foot Traffic and Temporal Distribution}
+
+\hspace{3.5em}To systematically investigate stair utilization patterns, we developed two distinct behavioral models through systematic observational analysis, designed to characterize typical movement protocols and user interaction dynamics.
+
+\begin{itemize}
+
+
+\item  Long term low frequency use pattern:
+\begin{equation}
+\label{eq9}
+\hfill
+V_{\text{total}} = \frac{k \cdot F \cdot d \cdot N_{\text{low}} \cdot \left(e^{\lambda t_{\text{long}}} - 1\right)}{\lambda H_0}
+\end{equation}
+
+\item  Short term hign frequency use pattern:
+\begin{equation}
+\label{eq9}
+\hfill
+V_{\text{total}} = \frac{k \cdot F \cdot d \cdot N_{\text{high}} \cdot t_{\text{short}}}{H_0}
+\end{equation}
+\hspace{1.5em}Through computational analysis of empirical datasets, both models generate theoretical wear magnitudes. Systematic comparison between these simulated wear patterns and empirical field measurements enables probabilistic inference of historical utilization patterns. When empirical measurements demonstrate closer alignment with Model 1 projections, we can deduce the longitudinal patterns of reduced-frequency stair utilization.
+
+\end{itemize}
+
+\section{Sub-model III: Age Estimation Model}
+\hspace{1.5em}Exposure to pedestrian traffic and environmental weathering induces progressive structural degradation in staircases. To establish a chronological assessment model, we develop a multifactorial model that integrates pedestrian load metrics and environmental variables. This approach quantitatively correlates material deterioration rates with usage patterns and climatic erosion indices to determine the using age of stairs.
+
+\subsection{Model Description}
+\hspace{1.5em}To estimate the age of the stairwell, we integrate the Archard Wear Model with a Material Aging Model. The total wear depth \( D(t) \) over time \( t \) is expressed as:
+
+\begin{equation} 
+\label{eq:10}
+D(t) = \int_0^t \left( \frac{k(\tau) \cdot F(\tau) \cdot v(\tau)}{H(\tau)} \right) d\tau + A_0 \cdot \left(1 - e^{-\lambda t}\right)
+\end{equation}
+
+In the equation, \( \tau \) serves as an integration variable with no specific physical meaning.
+
+\subsection{Task 5: Age Estimation and Reliability Analysis}
+\subsubsection{Age Estimation}
+\hspace{1.5em}Based on the Age Estimation Model, the age of the stairs can be approximated by evaluating relevant parameters. Among these, \( H_0 \), \( \lambda \), \( k \), and \( A_0 \) are determined through consultation of relevant literature or resources. The wear depth \( D \) is obtained from field measurements, while the force \( F \) and sliding velocity \( v \) can be estimated using common analytical methods derived from real-world observations. By inputting the measured wear depth \( D \) into the model, an approximate age of the stairs can be derived.
+
+This process involves a series of systematic steps that ensure the accuracy and reliability of the estimation. The following two figures illustrate the sensitivity indices of different parameters on age prediction and the accruacy of model prediction.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=16cm]{P5.png}
+    \caption{The Sensitivity Heatmap}
+\end{figure}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{P6.png}
+    \caption{Plot of the Fitting between Model Predictions and Historical Data}
+\end{figure}
+
+\newpage
+\subsubsection{Reliability Analysis}
+\hspace{1.5em}To assess the reliability of the model, we employ a comprehensive evaluation framework that combines quantitative and qualitative validation methods. For quantitative evaluation, we conduct a sensitivity analysis by computing the partial derivatives of the estimated age with respect to each parameter:
+
+\begin{equation}
+\label{eq12}
+\frac{\partial t}{\partial p_i}
+\end{equation}
+where \( p_i \) represents the model parameters. Additionally, we utilize Monte Carlo simulations to account for parametric uncertainties and estimate the confidence interval of the predicted age.
+
+The results of the Monte Carlo simulation are presented as follows, with a confidence interval of 95\%.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=14cm]{P8.png}
+    \caption{The Result of Monte Carlo Simulation}
+\end{figure}
+
+\newpage
+From a qualitative perspective, we validate the model by comparing its predictions with known ages of stairwells. The relative error is calculated as:
+
+\begin{equation}
+\label{eq16}
+\hfill \varepsilon = \frac{|t_{\text{model}} - t_{\text{real}}|}{t_{\text{real}}} \times 100\% 
+\end{equation}
+
+Where \(\varepsilon\) represents the error rate, \( t_{\text{model}} \) is the age predicted by the model and \( t_{\text{real}} \) is the actual age. This approach ensures the model's accuracy and reliability in real-world applications.
+
+%\subsubsection{Control Equations and Boundary Conditions}
+
+%\subsubsection{Determination of Inflow Time and Amount}
+
+%\subsection{Standby Model}
+
+%\subsection{Results}
+
+%\quad~ We first give the value of parameters based on others’ studies. Then we get the calculation results and simulating results via those data.
+
+\subsection{Task 6: Identification and Analysis of Repair and Renovation Interventions}
+\hspace{1.5em}To identify the presence of any repair interventions, we can initiate our investigation from two distinct perspectives. 
+
+Firstly, through Wear Pattern Analysis, we hypothesize that in the absence of repairs, the distribution of wear should exhibit uniformity across the specimen. Consequently, if a specific area demonstrates a wear depth significantly lower than the value predicted by the model, this discrepancy may serve as preliminary evidence suggesting the occurrence of repair work.
+
+Secondly, by systematically applying established material aging models, we conduct a comprehensive analysis of degradation trajectories across various regions of the specimen. The identification of discrete zones that exhibit divergent aging kinetics, inconsistent with the bulk material's degradation pattern, offers secondary corroboration for the likelihood of repair interventions. This dual-pronged approach ensures a robust and methodical examination of the specimen's wear characteristics, facilitating a more accurate determination of its repair history
+
+\subsection{Task 7: Material Source Analysis}
+\hspace{1.5em}Based on the context, materials can be classified into two primary categories: stone and wood. To conduct a comprehensive material provenance analysis, we employ a dual-spectroscopic approach. For stone materials, elemental quantification is performed using a Thermo Scientific Niton XL3t 950 handheld XRF analyzer \cite{3}, complemented by a Renishaw inVia Qontor confocal Raman microscope \cite{4} for molecular characterization. This combined methodology aligns with the non-destructive characterization framework established in recent lithic sourcing studies, supporting accurate and reliable identification of stone origins.
+
+For wood materials, species identification is carried out using a Bruker Matrix-F FT-NIR spectrometer \cite{5} in conjunction with OPUS 7.5 chemometric software, which facilitates precise spectral analysis. Additionally, dendrochronological patterns are reconstructed through ultrasonic velocity measurements \cite{6}, following a non-invasive methodology validated in recent conservation research. This approach allows for the determination of wood age and growth patterns while maintaining the integrity of the material.
+
+To further illustrate the process of material source identification, we present an image of the XRF analysis equipment used in our study. The XRF analysis provides a non-destructive method to identify the elemental composition of the materials, which is crucial for understanding their origin and history.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=14cm]{P4.jpg} % 请替换为XRF.png的实际路径
+    \caption{XRF Analysis for Material Source Identification}
+    \label{fig:XRF}
+\end{figure}
+
+By integrating these advanced analytical techniques, we aim to provide a thorough and non-destructive examination of both stone and wood materials, contributing to a robust foundation for further research and conservation efforts.
+
+%\subsubsection{Determination of Parameters}
+
+%After establishing the model, we have to determine the value of some important parameters.
+
+%As scholar Beum Kim points out, the optimal temperature for bath is between 41 and 45$^\circ$C [1]. Meanwhile, according to Shimodozono's study, 41$^\circ$C warm water bath is the perfect choice for individual health [2]. So it is reasonable for us to focus on $41^\circ$C $\sim 45^\circ$C. Because adding hot water continuously is a steady process, so the mean temperature of bath water is supposed to be constant. We value the temperature of inflow and outflow water with the maximum and minimum temperature respectively.
+
+%The values of all parameters needed are shown as follows:
+
+
+%\subsubsection{Calculating Results}
+
+%Putting the above value of parameters into the equations we derived before, we can get the some data as follows:
+
+%%普通表格
+%\begin{table}[h]  %h表示固定在当前位置
+%\centering        %设置居中
+%\caption{The calculating results}  %表标题
+%\vspace{0.15cm}
+%\label{tab2}                       %设置表的引用标签
+%\begin{tabular}{|c|c|c|}  %3个c表示3列, |可选, 表示绘制各列间的竖线
+%\hline                    %画横线
+%Variables & Values & Unit     \\ \hline  %各列间用&隔开
+%$A_1$     & 1.05   &   $m^2$  \\ \hline
+%$A_2$     & 2.24   &   $m^2$  \\ \hline
+%$\Phi_1$  & 189.00 &   $W$   \\ \hline
+%$\Phi_2$  & 43.47  &   $W$   \\ \hline
+%$\Phi$    & 232.47 &   $W$   \\ \hline
+%$q_m$     & 0.014  &   $g/s$ \\ \hline
+%\end{tabular}
+%\end{table}
+
+%From Table \ref{tab2}, ......
+
+
+%\section{Correction and Contrast of Sub-Models}
+
+%After establishing two basic sub-models, we have to correct them in consideration of evaporation heat transfer. Then we define two evaluation criteria to compare the two sub-models in order to determine the optimal bath strategy.
+
+%\subsection{Correction with Evaporation Heat Transfer}
+
+%Someone may confuse about the above results: why the mass flow in the first sub-model is so small? Why the standby time is so long? Actually, the above two sub-models are based on ideal conditions without consideration of the change of boundary conditions, the motions made by the person in bathtub and the evaporation of bath water, etc. The influence of personal motions will be discussed later. Here we introducing the evaporation of bath water to correct sub-models.
+
+%\subsection{Contrast of Two Sub-Models}
+
+%Firstly we define two evaluation criteria. Then we contrast the two submodels via these two criteria. Thus we can derive the best strategy for the person in the bathtub to adopt.
+
+
+\section{Model Analysis and Sensitivity Analysis}
+
+\subsection{Model Analysis}
+\hspace{1.5em}In this essay, the wear analysis framework is constructed by synthesizing Archard wear model, material aging model and age estimation model. At the same time, the nonlinear regression fitting R$^2$ reaches 0.7923, indicating that the model can restore and predict the actual model trend well.The innovations in the model are as follows:
+ 
+\begin{itemize}
+\item \textbf{Multifactor coupling}: The influence of environment and time on wear was quantified by temperature dependent wear coefficient k(T) and dynamic material hardness H(t).
+\item \textbf{Spatial distribution modeling}: FEM-based pressure distribution analysis improves the physical authenticity of contact force calculations.
+\item \textbf{Nondestructive detection}: The combination of XRF and Raman spectroscopy enables accurate identification of material sources.
+\end{itemize}
+
+\subsection{Sensitivity Analysis}
+\hspace{1.5em}Identify key sensitive parameters by calculating partial derivatives:
+\begin{equation}
+\frac{\partial D(t)}{\partial k} = \frac{F \cdot S}{H_0} \cdot \frac{1 - e^{-\lambda t}}{\lambda},
+\end{equation}
+
+\begin{equation}
+\quad \frac{\partial D(t)}{\partial \lambda} = -\frac{k F S}{H_0 \lambda^2} \left[ (1 + \lambda t)e^{-\lambda t} - 1 \right]
+\end{equation}
+\hspace{1.5em}The figure below demonstrates the impact of parameter perturbations on the model results.
+\newpage
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=12cm]{P7.png}
+    \caption{Graph of Results of Parameter Perturbation}
+\end{figure}
+
+\hspace{1.5em}Through computational analysis, the results are as follows:
+\begin{itemize}
+\item {k}:±10\% variation leads to ±8.2\% deviation of predicted age, which is the highest sensitivity.
+\item {\lambda}:when  $\lambda$  > 0.05yr
+\textsuperscript{-1}, the tolerance of initial error of the model is reduced
+\item {T}:According to Arrhenius\ref{eq:2}-\ref{eq:3}，For every 20K increase in temperature,k
+increase by about 15%\%.
+\end{itemize}
+
+
+%%三线表
+%\begin{table}[h] %h表示固定在当前位置
+%\centering  %设置居中
+%\caption{Variation of some parameters}  %表标题
+%\label{tab7} %设置表的引用标签
+%\begin{tabular}{ccccccc} %7个c表示7列, c表示每列居中对齐, 还有l和r可选
+%\toprule  %画顶端横线
+%$V$      & $A_1$   & $A_2$   & $T_2$    & $q_{m1}$ & $q_{m2}$ & %$\Phi_q$ \\
+%\midrule  %画中间横线
+%-15.00\% & -5.06\% & -9.31\% & -12.67\% & -2.67\%  & -14.14\% & -5.80\% \\
+%-12.00\% & -4.04\% & -7.43\% & -10.09\% & -2.13\%  & -11.31\% & -4.63\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%-8.00\%  & -2.68\% & -4.94\% & -6.68\%  & -1.41\%  & -7.54\%  & -3.07\% \\
+%\bottomrule  %画底部横线
+%\end{tabular}
+%\end{table}
+
+\section{Strength and Weakness}
+
+\subsection{Strength}
+
+\begin{itemize}
+\item We analyze the problem based on thermodynamic formulas and laws, so that the model we established is of great validity.
+
+\item Our model is fairly robust due to our careful corrections in consideration of real-life situations and detailed sensitivity analysis.
+
+\item Via Fluent software, we simulate the time field of different areas throughout the bathtub. The outcome is vivid for us to understand the changing process.
+
+\item We come up with various criteria to compare different situations, like water consumption and the time of adding hot water. Hence an overall comparison can be made according to these criteria.
+
+\item Besides common factors, we still consider other factors, such as evaporation and radiation heat transfer. The evaporation turns out to be the main reason of heat loss, which corresponds with other scientist’s experimental outcome.
+\end{itemize}
+
+\subsection{Weakness}
+
+\begin{itemize}
+\item Having knowing the range of some parameters from others’ essays, we choose a value from them to apply in our model. Those values may not be reasonable in reality.
+
+\item Although we investigate a lot in the influence of personal motions, they are so complicated that need to be studied further.
+
+\item Limited to time, we do not conduct sensitivity analysis for the influence of personal surface area.
+\end{itemize}
+
+
+\newpage
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{Reference}
+
+\bibitem{1} Archard, J. F. (1953). Contact and Rubbing of Flat Surfaces. Journal of Applied Physics, 24(8), 981–988.
+DOI: 10.1063/1.1721448
+\bibitem{2} Saba, M., Quiñones-Bolaños, E. E., & López, A. L. (2018). A review of the mathematical models used for simulation of calcareous stone deterioration in historical buildings. Atmospheric Environment, 180, 156 - 166
+\bibitem{3} Shackley, M. S. (2022). Portable X-ray fluorescence spectrometry (pXRF): The good, the bad, and the ugly. Journal of Archaeological Science: Reports, 46, 103673.
+DOI: 10.1016/j.jasrep.2022.103673
+\bibitem{4}Potts, P. J., et al. (2021). Raman spectroscopy in cultural heritage: A practical review. Analytical Methods, 13(48), 5759-5779.
+DOI: 10.1039/D1AY01580H
+\bibitem{5} Tsuchikawa, S., & Kobori, H. (2023). Near-infrared spectroscopy for wood science and technology. Journal of Wood Science, 69(1), 1-14.
+DOI: 10.1186/s10086-023-02082-5
+\bibitem{6} Krzemień, L., et al. (2022). Non-destructive evaluation of historical timber structures using ultrasonic pulse velocity. Construction and Building Materials, 342, 127935.
+\end{thebibliography}
+
+
+\newpage
+\newcounter{lastpage}
+\setcounter{lastpage}{\value{page}}
+\thispagestyle{empty} 
+
+\section*{Report on Use of AI}
+
+\begin{enumerate}
+\item DeepSeek (Jan 20, 2024 version, DeepSeek-V3) 
+\begin{description}
+\item[Query:] <Modify synonyms in the paragraph to avoid monotonous word usage.> 
+\item[Output:] <Modified Results: compute, calculate, count>
+\end{description}
+
+\item DeepSeek (Jan 20, 2024 version, DeepSeek-V3) 
+\begin{description}
+\item[Query:] <Optimize the format and layout for me.> 
+\item[Output:] <Modified Results: As shown in the paper layout>
+\end{description}
+
+\item DeepSeek (Jan 20, 2024 version, DeepSeek-V3) 
+\begin{description}
+\item[Query:] <Polish the language and expressions of the paragraph.> 
+\item[Output:] <Modified Results: quantify the wear patterns, 
+ behavioral dynamics, dimensionless parameter>
+\end{description}
+
+% 重置页码
+\clearpage
+\setcounter{page}{\value{lastpage}}
+
+\end{document}
+%%
+%% This work consists of these files mcmthesis.dtx,
+%%                                   figures/ and
+%%                                   code/,
+%% and the derived files             mcmthesis.cls,
+%%                                   mcmthesis-demo.tex,
+%%                                   README,
+%%                                   LICENSE,
+%%                                   mcmthesis.pdf and
+%%                                   mcmthesis-demo.pdf.
+%%
+%% End of file `mcmthesis-demo.tex'.
