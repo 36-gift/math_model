@@ -1,7 +1,7 @@
 import google.generativeai as genai
 
 # 替换为您的 API 密钥
-GOOGLE_API_KEY = "AIzaSyBMD49WEiH1_Vf-MZor32R8jh-yN68h5Pg"
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KET")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
